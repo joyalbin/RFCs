@@ -103,7 +103,8 @@ EA is an `ElementArrangement` enum on each `SpyreTensorLayout`:
 | `DL16_TO_FP32` | staggered FP32 | widening `STANDARD` 16-bit → `FP32` |
 | `FP32_TO_DL16` | staggered 16-bit | narrowing `STANDARD` `FP32` → 16-bit |
 | `EXX2` | reduction mode, two values/stick | layernorm partial reduction |
-| `QFP8CH` | FP8 quant output — **out of scope** | FP8 quantization |
+| `QFP8CH` | FP8 quant output — **out of scope** | FP8 activation quantization |
+| `QFP8WT` | FP8 quant output — **out of scope** | FP8 weight quantization |
 
 `DL16_TO_FP32`/`FP32_TO_DL16` form `STAGGERED_EAS` — conversions that must
 preserve the input device layout.
@@ -171,13 +172,13 @@ layernormscale, abs, neg, exp, sigmoid, exx2, layernormnorm, identity, sqrt,
 rsqrt, topkvalue, topkindex, floor, to_dtype, maximum, minimum, prod
 ```
 
-An op not in the list receiving a staggered FP32 input is a compile-time
+An op not in the list receiving a FP32 input is a compile-time
 `Unsupported`, not a silent downcast.
 
 ## Completeness: what's missing
 
 Because FP32 is ephemeral, completeness is one question: are the brackets closed
-and enforced? Four gaps:
+and enforced? Five gaps:
 
 1. **Bracket-closure check (missing).** `validate_ops` is per-op; nothing verifies
    *global* closure — that every upcast is matched by a downcast on all paths and
@@ -193,6 +194,8 @@ and enforced? Four gaps:
    re-accounts for padding. It handles trailing padding but bails (`return []`)
    when the tensor doesn't start on a stick boundary — an acceptable constraint,
    but the bail should be a hard-fail, not a silent drop.
+5. **Standalone eager conversion.** Eager `.to(fp32)` up/downcasts conversions not
+   ensure backet-closure and not guaranteed to output standard FP32
 
 **Debug aid.** With no device-side un-stagger, inspection is host-side: copy the
 staggered FP32 to host verbatim and reverse the permutation there for golden
