@@ -1,6 +1,6 @@
 # FP32 Element Arrangement
 
-**Authors:** @joyalbin (owner), @moriohara, @lupalby, @pradghos, @msrivats
+**Authors:** @joyalbin (owner), @moriohara, @lupalby, @pradghos, @msrivats, @avery-blanchard, @manid2
 
 > **Status:** draft. RFC number is the FP32 support epic
 > ([#2971](https://github.com/torch-spyre/torch-spyre/issues/2971)).
